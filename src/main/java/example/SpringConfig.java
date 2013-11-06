@@ -1,12 +1,9 @@
 package example;
 
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.config.ClientConfig;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,20 +12,13 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("example")
 public class SpringConfig {
 
-	
-	@Bean @Qualifier("embedded")
-	public Client embeddedClient() {
-		Node node = NodeBuilder.nodeBuilder().node();
-		return node.client();
+	@Bean
+	public JestClient jestClient() {
+		 ClientConfig clientConfig = new ClientConfig.Builder("http://localhost:9200").multiThreaded(true).build();
+		 JestClientFactory factory = new JestClientFactory();
+		 factory.setClientConfig(clientConfig);
+		 
+		 return factory.getObject();
 	}
-	
-	@Bean @Qualifier("cluster")
-	public Client clusterClient() {
-		return new TransportClient().
-				addTransportAddress(new InetSocketTransportAddress("127.0.0.1", 9300));
-	}
-	
-	@Bean BulkRequestBuilder bulkRequest() {
-		return clusterClient().prepareBulk();
-	}
+
 }
