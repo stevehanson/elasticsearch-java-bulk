@@ -1,12 +1,11 @@
 package example;
 
-import java.io.IOException;
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.Bulk.Builder;
+import io.searchbox.core.Index;
 
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
@@ -14,32 +13,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class Indexer {
 
-	private Client client;
+	private JestClient client;
 	private TweetService tweetService;
 	
 	@Autowired 
-	public Indexer(@Qualifier("cluster") Client client, TweetService tweetService) {
+	public Indexer(JestClient client, TweetService tweetService) {
 		this.client = client;
 		this.tweetService = tweetService;
 	}
 	
-	public void indexSomeStuff() throws IOException {
-		BulkRequestBuilder bulkRequest = client.prepareBulk();
+	public void indexSomeStuff() throws Exception {
+		Builder bulkBuilder = new Bulk.Builder();
 		
 		for (Tweet tweet : tweetService.getTweets()) {
-			bulkRequest.add(client.prepareIndex("twitter","tweet", String.valueOf(tweet.getId()) )
-					.setSource(tweet.toJson()));
-		}
-
-		BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-		if (bulkResponse.hasFailures()) {
-		    System.out.println("FAILURES!");
+			System.out.println("Indexing tweet: " + tweet.getMessage());
+			Index index = new Index.Builder(tweet).index("twitter").type("tweet").build();
+			bulkBuilder.addAction(index);
 		}
 		
+		client.execute(bulkBuilder.build());
+		
+
 	}
 	
 	@SuppressWarnings("resource")
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		 ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
 		 Indexer indexer = context.getBean(Indexer.class);
 		 indexer.indexSomeStuff();

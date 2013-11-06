@@ -1,9 +1,5 @@
 package example;
 
-import java.io.IOException;
-
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 
 public class Tweet {
 
@@ -26,13 +22,5 @@ public class Tweet {
 	public String getMessage() {
 		return message;
 	}
-	
-	public XContentBuilder toJson() throws IOException {
-		return XContentFactory.jsonBuilder()
-        .startObject()
-            .field("id", this.id)
-            .field("user", this.user)
-            .field("message", this.message)
-        .endObject();
-	}
+
 }

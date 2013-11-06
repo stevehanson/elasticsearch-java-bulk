@@ -2,10 +2,19 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 
 repositories {
-   mavenCentral()
+   
+   maven {
+    mavenCentral()
+   	url "https://oss.sonatype.org/content/groups/public/"
+   }
 }
 
 dependencies {
    compile 'org.springframework:spring-webmvc:3.2.2.RELEASE'
-   compile 'org.elasticsearch:elasticsearch:0.90.5'
+   compile 'io.searchbox:jest:0.0.5'
+}
+
+task libs(type: Sync) {
+  from configurations.compile
+  into "libs"
 }
