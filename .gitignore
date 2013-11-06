@@ -1,6 +1,7 @@
 .gradle
 bin
 data
+libs
 target
 .settings
 .classpath
