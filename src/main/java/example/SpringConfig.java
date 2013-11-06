@@ -12,13 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("example")
 public class SpringConfig {
 
-	
 	@Bean
-	public JestClient embeddedClient() {
+	public JestClient jestClient() {
 		 ClientConfig clientConfig = new ClientConfig.Builder("http://localhost:9200").multiThreaded(true).build();
-		// Construct a new Jest client according to configuration via factory
 		 JestClientFactory factory = new JestClientFactory();
 		 factory.setClientConfig(clientConfig);
+		 
 		 return factory.getObject();
 	}
 
